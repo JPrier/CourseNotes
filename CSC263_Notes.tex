@@ -1,0 +1,549 @@
+\documentclass{article}
+\usepackage{mathtools}
+\DeclarePairedDelimiter\ceil{\lceil}{\rceil}
+\DeclarePairedDelimiter\floor{\lfloor}{\rfloor}
+\usepackage{listings}
+\usepackage{color}
+
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+
+\lstset{frame=tb,
+	language=Python,
+	aboveskip=3mm,
+	belowskip=3mm,
+	showstringspaces=false,
+	columns=flexible,
+	basicstyle={\small\ttfamily},
+	numbers=none,
+	numberstyle=\tiny\color{gray},
+	keywordstyle=\color{blue},
+	commentstyle=\color{dkgreen},
+	stringstyle=\color{mauve},
+	breaklines=true,
+	breakatwhitespace=true,
+	tabsize=3
+}
+
+\title{CSC263 Notes}
+\author{Joshua Prier}
+\date{January 10, 2017}
+
+\begin{document}
+	\maketitle
+	\section{Week One}
+	\subsection{Day One: Big-O Review}
+	
+		Reading: Asymptotic Bounds\\
+		\\
+		Big-Oh notation is a mathematical notation that classifies functions according to their growth rate\\
+		$$O(n^2) = \{n^2, 4n^{\alpha}, n^{\alpha} + n, ... \}$$
+		Big-Oh is a set of functions that\textbf{ grow at most as fast} as the given function, i.e $n^2$\\
+		$$\Omega(n^2) = \{n^2, 4n^2, n^2 + n, n^3, n^4, ...\}$$
+		Big-Omega is a set of functions that \textbf{grow at least as fast} as the given function\\
+		$$\Theta(n^2) = \Omega(n^2) \cap O(n^2) = \{n^2, 4n^2, n^2 + n, ...\}$$
+		Big-Theta is a set of functions that \textbf{grow as fast} as the given function\\
+		\\
+		In this course we will restrict our function f() to be the worst-case time complexity of an algorithm\\
+		\\
+		\begin{center}
+			\large{How do we \underline{\textbf{prove}} asymptotic bounds for worst-case time complexity?}\\
+		\end{center}
+		
+		Let t(x) be the number of steps taken by algorithm A on input x\\
+		Let T(n) be the worst-case time complexity of algorithm A\\
+		T(n) = max t(x) on all inputs x of size n\\
+		\\
+		\begin{enumerate}
+			\item To prove $T(n)\in O(g(n))$ show there is a constant $c>0$ and an input size $n_0 >0$ such that for all $n \ge n_0$\\
+			$$T(n) \le cg(n)$$
+			$\iff max\{t(x); x$ is an input of size $n \} \le cg(n)$\\
+			\\
+			$\iff$ for \textbf{\emph{every}} input of size n, A takes \textbf{\emph{at most}} $cg(n)$ steps\\
+			\\\\
+			\item To prove $T(n)\in\Omega (g(n))$ show there is a constant $c>0$ and an input size $n_0 >0$, such that for all $n\ge n_0$\\
+			$$T(n)\ge cg(n)$$\\
+			$\iff max\{t(x); x$ is an input of size $n\} \ge cg(n)$\\\\
+			$\iff$ for \textbf{\emph{some}} input of size n, A takes \textbf{\emph{at least}} cg(n) steps\\\\
+			\\
+			\item To prove $T(n)\in\Theta (g(n))$ show there is a constant $c>0$ and an input size $n_0 >0$, such that for all $n \ge n_0$\\
+			$$T(n) = cg(n)$$\\
+			$\iff max\{t(x); x$ is an input of size $n\} = cg(n)$\\\\
+			$\iff$ for \textbf{\emph{every}} input of size n, A takes \textbf{\emph{exactly}} cg(n) steps\\\\\\\\
+			
+			
+		\end{enumerate}
+	
+	\subsection{Day Two: Abstract Data Types}
+		Exercises: All 6.1, 6.2-6, 6.3-2, 6.3-3\\
+		Readings: Read code for MAX-HEAPIFY in textbook and write an iterative implementation\\
+		\\\\
+		Abstract data types describe an object and its operation in the POV of the user\\
+		Data Structure is a specific implementation of an ADT, POV of the coder
+		\\\\
+		PQ Object: sets of elements with "keys" ("priority") that can be compared
+		\\\\
+		PQ Operations:
+		\begin{enumerate}
+			\item Insert(S,x): Insert x in S $S<-S\cup$ \{x\}
+			\item max(S): Return an element wiht highest priority in S 
+			\item Extract\_Max(S): Returns x$<-$max(S) AND removes it from s
+		\end{enumerate}
+		"Naive Implementations"\\
+		Linked List: Insert- O(1), Max- O(N)\\
+		Sorted Linked List: Insert- O(N), Max- O(1)\\\\
+		Heap data structure\\
+		performs both in O(lg n)\\\
+		
+		Abstract representation of heap: ADD THIS IN\\
+		
+		Max Heap Property:\\
+		The key of the parent node is \textbf{at least} the value of the key's of it's children\\
+		
+		Min Heap Property:\\
+		The key of the parent node is \textbf{at most} the value of the key's of it's children\\
+		
+		Implementation:\\
+		("going down" one level of abstraction from the tree representation)\\
+		\begin{tabular}{r|cl}
+			content.
+		\end{tabular}
+		\\
+		$Root(A) = 1$\\
+		$Parent(i) = \floor{\frac{i}{2}}$\\
+		$Left(i) = 2i$\\
+		$Right(i) = 2i + 1$\\
+		\\
+		Max-Heap:\\
+		\begin{itemize}
+			\item Subprocedure for all other heap operations
+			\item Precondition: Left(i) and Right(i) are both MAX HEAPS
+			\item Idea: A[i] might be smaller than it's children (i.e. doesn't satisfy the heap property) and thus it needs to "float down"
+		\end{itemize}
+		Place max heap drawings here\\\\
+		To build a Heap you sort an array one object at a time\\\\
+		sudo code:\\
+		\begin{enumerate}
+			\item check if Left(i) and Right(i) exist
+			\item L= max\_index(A[i], A[Left(i)], A[Right(i)])
+			\item if L$\neq$ i: exchange A[L] and A[i], MAX-HEAPIFY(A,L)\\\\\\
+		\end{enumerate}
+		Note: Height of binary tree with n nodes is log(n)\\
+		
+		$$\sum_{i=0}^{h} 2^i = 2^{h+1} -1$$
+		
+		MAX(A) = A[1]\\
+		EXTRACT-MAX(A)
+		\begin{itemize}
+			\item swap root last element
+			\item call heapify on root
+			\item decrease array by 1
+		\end{itemize}
+		
+	\subsection{Lab 1: Time Complexity Review}	
+		
+		TA: Yue Jiang\\
+		Email: yuenj.jiang@mail.utoronto.ca\\\\
+		\begin{center}
+			T(n) = worst case time complexity\\
+			t(x) = number of steps taken by algorithm A on input x\\
+			T(n) = max{t(x) | x is an inoout of size n}\\
+		\end{center}
+		 - lower bound is any line under the worst case\\
+		 - upper bound is any line over the worst case \\\\\\
+		 \begin{lstlisting}
+		 SeqSearch(A[1,...,n], x):
+			 i = 1
+			 found = False
+			 while i <= n and not found:
+				 if A[i] = x:
+					 found = True
+				 i = i + 1
+			 return found
+		 \end{lstlisting}
+		 Let T(n) = worst case time complexity of SeqSearch\\
+		 $$T(n)=\Theta(n)~iff~T(n)=O(n)~and~T(n)=\Omega(n)$$
+		 O: Analyze the loops\\
+		 $\Omega$: Give a bad example\\
+		 n iterations\\
+		 In iteration we take O(1) time\\
+		 T(n) = n * O(1) = O(n)\\
+		 For fixed n, (insert table 2), when x is in the last entry of A and x is not other entries, we have the \textbf{\emph{worst case}}\\
+		 \begin{lstlisting}
+		 BubbleSort(A[1,...n]):
+			 last = n
+			 sorted = False
+			 while not sorted:
+				 sorted = True
+				 for j = 1 to last - 1:
+					 if A[j] > A[j + 1]:
+						 swap(A[j], A[j + 1])
+						 sorted = False
+				 last = last - 1
+			 return A[1,...,n]
+		 \end{lstlisting}
+		 \textbf{Sorting Example:}\\
+		        ~~~~~~2 3 7 1 4\\
+		  1st   2 3 1 7 4\\
+		        ~~~~~~~2 3 1 4 7\\
+		  2nd   2 1 3 4 7\\
+		  3rd   1 2 3 4 7\\\\
+		  last = n, last = last - 1, last = 1\\
+		  while n - 1 iterations, n(n-1) > 1\\
+		  for $\le$ n-1 iterations\\
+		  T(n) = (n-1)(n-1)O(n)\\\\
+		  \textbf{Worst Case Example:}\\
+			The number in the array is in decreasing order\\
+			$(n-1)+(n-2)+...+1=\frac{n(n-1)}{2}$ steps\\\\\\\\\\
+		\large{\textbf{Heap}}\\
+		\textbf{Methods:}\\
+		Insert()\\
+		ExtractMax()\\
+		
+	\section{Week Two}
+		\subsection{Day One: Binomial Heaps}
+		Exercises: 12.2-3 and 12.3-1 \\\\
+		Merging regular heaps?\\
+		- concat. both heaps\\
+		- call Build-Heap (runs in O(n))\\\\
+		\textbf{We Want:} To merge in O(log N) time\\\\
+		Substructure of Binomial Heap: Binomial Tree\\
+		 - recursive def$^{n}$ of \emph{shape}\\
+		 (Binomial Trees figure 2.1.1)\\
+		 (depth table for B$_4$ figure 2.1.2)\\\\
+		 \textbf{Properties of Bin. Trees:} (easily proven with induction, try with exercise)\\
+		    For Bin. Tree B$_k$
+		 \begin{enumerate}
+		 	\item There are $2^k$ nodes
+		 	\item Height is $k$
+		 	\item At depth $i$ B$_k$ has $_k$C$_i$ nodes
+		 	\item B$_k$'s root has a degree k and it's children have shape: B$_{k-1}$, B$_{k-2}$, ..., B$_1$, B$_0$ (fig 2.1.3)\\
+		 \end{enumerate}
+		 \textbf{\Large Data Structure: Binomial Heap}\\ \large
+		 - Sequennce H$_n$ of binomial trees that satisfy the following properties
+		 \begin{enumerate}
+		 	\item each tree satisfies the heap property
+		 	\item The sequence consists of \textbf{\emph{strictly increasing}} $k$'s\\
+		 	(fig 2.1.4)\\
+		 \end{enumerate}
+		 Relation to binary representation: \\
+		 n = $<$ b$_{\floor{lg n}}$ ... b$_1$ b$_0$ $>_2$\\
+		 n = $\sum_{i=0}^{\floor{lg n}} b_i 2^i$ (binary representation is \textbf{\emph{unique}})\\
+		 Ex: n nodes in bin heap (fig 2.1.5)\\
+		 Ex: 8 = $< 1000 >_2$ (fig 2.1.6)\\\\
+		 Let $\alpha$(n): \# of 1's in bin representation of n\\
+		 a) $H_n$ has $\alpha$(n) trees\\
+		 b) $H_n$ has n - $\alpha$(n) edges \textbf{(proving this in Assignment \#1)}\\\\
+		 Min(H) = iterate over roots\\
+		 Time Complexity: O(log n) *Not $\Theta$(log n)*\\\\
+		 Note: Length of Bin Rep. of n is $\floor{log n}$\\
+		 
+		 \subsection{Day Two: }
+		 ADT: Mergeable priority queue\\
+		 \begin{itemize}
+		 	\item MIN(H)
+		 	\item INSERT(H, x)
+		 	\item EXTRACT\_MIN(x)
+		 	\item UNION(H$_1$, H$_2$)\\
+		 \end{itemize}
+		Data Structure that implements Mergeable priority queue: Binomial Heap\\
+		(fig. 2.2.1)\\
+		Assume we have a UNION(H$_1$, H$_2$) operation: (fig 2.2.2)\\\\\\\\
+		How would you implement INSERT(H, x) and EXTRACT\_MIN(H) using UNION?\\\\
+		INSERT(H,x)
+		\begin{itemize}
+			\item create a one element heap H containing x
+			\item call UNION(H$_1$, H$_2$)
+		\end{itemize}
+		Time Complexity: O(log n)\\\\
+		EXTRACT\_MIN(H)
+		\begin{itemize}
+			\item Find binomial tree in H with min root, call Tree T (O(log n))
+			\item H$_1$ = H - T (Constant)
+			\item H$_2$ = children of T's root (Constant)
+			\item UNION(H$_1$, H$_2$) (O(log n))
+		\end{itemize}
+		Time Complexity: O(log n)\\\\
+		\textbf{Example: } UNION(H$_1$, H$_2$)\\
+		(fig 2.2.3)\\
+		\textbf{Note}: It is not a Binomial Heap if there is multiple of the same length trees\\
+		\textbf{Note}: the actual process of the merge is linear\\
+		\emph{Alg:} Loop over all trees from smallest to largest, if there are 2 or 3 B$_i$'s in the collection, take the first 2 and link one tree to the root of the other\\
+		(fig 2.2.4)\\
+		(fig 2.2.5)\\\\
+		Runtime of UNION(H$_1$, H$_2$)\\
+		Merge: O(log n) where n = $\|H_1\| + \|H_2\|$\\
+		Max number of roots is $\floor{lg n} + 1$\\
+		\emph{How many links?}\\
+		For every size k, at most 1 link operation\\
+		why at most 1?
+		\begin{itemize}
+			\item because each binomial tree has at most 1 tree of size k and there is at most 1 carry
+		\end{itemize}
+		if\\ 
+		1: leave it\\
+		2: link them\\
+		3: link 2 of them\\
+		Time Complexity: O(lg n) + O(lg n), (Constant time "linking" for each k)\\\\
+		
+		\subsection{Lab 2: Abstract Data Types}
+		\textbf{Abstract Data Type (ADT):} What you want to do\\
+		e.g Priority Queue: First in first out\\\\
+		\textbf{Data Structure:} How to implement\\
+		e.g Heap:\\
+		Precondition: the subtree rooted at left(i) and right(i) are heaps\\
+		Postcondition: The subtree rooted at i is a heap
+		\begin{lstlisting}
+			MaxHeapify(A, i):
+				largest = index of max(A[i], A[left(i)], A[right(i)])
+				if largest != i:
+					then swap(A[i], A[largest])
+					MaxHeapify(A, largest)
+					
+			BuildMaxHeap(A):
+				n = length(A)
+				for i = \floor{\frac{n}{2}} down to 1:
+					MaxHeapify(A, i)
+		\end{lstlisting}
+		At depth $d$, there are at most $2^d$ nodes\\
+		Each node at depth $d$ had height $h-d$\\
+		Time complexity $\le \sum_{d=0}^{h-1}2^d(h-d)\le \sum_{i=1}^{h} 2^h-i$, let $i=h-d$\\
+		$\le 2^h\sum_{i=1}^{h}\frac{i}{2^i} < 2^h\sum_{i=1}^{\infty}\frac{i}{2^i} \le n\sum_{i=1}^{\infty}\frac{i}{2^i} < 2n = O(n)$	\\\\	
+	
+	\section{Week 3}
+		\subsection{Day One: BST\\}
+		Readings: AVL trees on website\\
+		Exercises:
+		\begin{itemize}
+			\item write pseudocode for insert, delete, search
+			\item why does deleting the successor fall into case 1 or 2?
+			\item 12.1-1, 12.2-1, 12.2-4, 12.3-1, 12.3-5\\
+		\end{itemize}
+		\textbf{Binary Search Tree Review}\\
+			def: binary tree satisfying BST property for any node x\\
+			x.key $\ge$ LEFT(x).key, if LEFT exists\\
+			x.key $\le$ RIGHT(x).key, if RIGHT exists\\\\
+			Problem with "regular" BSTs (fig 3.1.1)\\
+			INSERT(4, 5, 6, ..., n) creates an unbalanced BST, so you cannot assume that after inserting values the BST will stay balanced\\\\
+			AVL trees\\
+			First, we define \textbf{\emph{balance factor}} BF, (fig 3.1.2)\\
+			BF(v) = h$_r$ - h$_l$\\
+			definition of AVL: BST T where for each $v\in T$
+			$$- 1\le BF(v)\le + 1$$
+			$$h\le 1.44*log(n+2) \implies h\in\Theta(log n)$$
+			Examples of AVL trees:(fig 3.1.3)\\
+			\textbf{Benefits}:
+			\begin{itemize}
+				\item $h\in\Theta(log n)$
+				\item can do inserts, deletes, while efficiently maintaining height balance
+				\item elegant, relatively simple, works well in practice
+			\end{itemize}
+			INSERT(T, x): general idea
+			\begin{enumerate}
+				\item insert x into T as in any BST x is now a leaf
+				\item go from x to the root of T, and\\
+					- adjust BFs\\
+					- rebalance, if necessary
+				\item (fig 3.1.4)
+			\end{enumerate}
+			\textbf{How to rebalance?: rotations\\}
+			Single Right Rotation Example (fig 3.1.5)\\
+			Double Rotation Example (fig 3.1.5)\\
+			Rotation Explanation Example (fig 3.1.7)\\\\
+		
+		\subsection{Day Two: More on Rebalancing BSTs\\}
+		Let \textbf{A} be the \emph{first} node on the path from \textbf{X} to the root of the AVL Tree T that loses its balance, \\ i.e. BF(\textbf{A}) becomes +2 or -2 after \textbf{X} is inserted.\\\\
+		Two cases of inserting a node: (fig 3.2.3)\\
+		Two subcases of case 1: (fig 3.2.1)\\
+		\textbf{Claim: } BF(B) = 0 before insertion of x
+		\begin{center}
+			why?\\
+		\end{center}
+		otherwise insertion balances B without changing its height\\ 
+		(+/- 1 to 0) or insertion changes BF(B) to +/- 2 ~~(fig 3.2.2)\\\\
+		This Rotation:\\
+		a) Preserves the BST order (T$_1$, A, T$_2$, B, T$_3$)\\
+		b) Rebalances the height to what it ws before the insertion of x (h + 2)
+		Note: nodes above subtree are not affected by insertion of x since height is restored\\\\
+		Example for insertion that requires a double rotation to balance: (fig 3.2.4)\\\\
+		(High-Level) Algorithm for INSERT(T, X):
+		\begin{itemize}
+			\item insert X as with any BST, X is now a leaf
+			\item set BF(X) = 0
+			\item go from X to the root, updating BFs for each node, i, encountered
+			\begin{itemize}
+				\item if X is in the right subtree of increment BF(i), otherwise decrement
+				\item if BF(i) = 0, then stop
+				\item if BF = +/- 1, i$<$- parent(i), continue
+				\item if BF = +2
+				\begin{itemize}
+					\item let j = rightchild(i)
+					\item if BF(j) = +1, single left rotation
+					\item if BF(j) = -1, double right-left rotation\\
+					Note: update BFs of rotated nodes
+				\end{itemize}
+				\item if BF(i) = -2 (cases are symmetric)
+				\item i=root, stop\\
+			\end{itemize}
+		\end{itemize}
+		\subsection{Lab 3: BST Deletion}
+		\textbf{Deletion Operation for BSTs:}
+		\begin{itemize}
+			\item If $x$ has no children: just delete it
+			\item If $x$ has 1 child, delete x and link x's \emph{parent} to x's \emph{child} subtree
+			\item If $x$ has 2 children 
+			\begin{enumerate}
+				\item Find the left most node, $y$, in the right subtree of $x$ 
+				\item Replace $x$ with $y$
+				\item Delete $y$\\
+			\end{enumerate}
+		\end{itemize}
+		\textbf{Deletion Operation for AVL Trees:} (Balanced BSTs)\\$\|h(left)-h(right)\|\le 1$\\ (fig 3.3.2 \& fig 3.3.4)
+		\begin{enumerate}
+		\item
+		\begin{itemize}
+			\item If $x$ has no children: just delete it
+			\item If $x$ has 1 child, delete x and link x's \emph{parent} to x's \emph{child} subtree
+			\item If $x$ has 2 children
+			\begin{enumerate}
+				\item: Find the left most node, $y$, in the right subtree of $x$ 
+				\item: Replace $x$ with $y$
+				\item: Delete $y$
+			\end{enumerate}
+		\end{itemize}
+		\item Rotation\\
+	\end{enumerate}
+	\textbf{Examples of basic rotations: }(fig 3.3.3)\\\\
+\section{Week 4}
+	\subsection{Day One: RANK\\}
+	Look over sudo code of RANK\\\\
+	Finding Rank in Data Structures:
+	\begin{itemize}
+		\item Heap or Bin heap?
+		\begin{itemize}
+			\item cannot search efficiently
+		\end{itemize}
+		\item unmodified AVL tree?
+		\begin{itemize}
+			\item INSERT(), SEARCH(), DELETE(), $\Theta(log n)$
+			\item RANK(k) - inorder traversal until you find k $\Theta(n)$
+			\item SELECT(r) - inorder traversal until you find r$^{th}$ element $\Theta(n)$
+		\end{itemize}
+		\item AVL Tree with added field node.rank for each node
+		\begin{itemize}
+			\item RANK(k) - return SEARCH(k).rank $\Theta(log n)$
+			\item SELECT(r) - ranks are ordered like keys, why?\\
+			smaller keys = smaller ranks\\ $\Theta(log n)$
+			\item INSERT/DELETE - worst-case: you have to update all ranks in tree (ex: updating minimum) $\Theta(n)$
+		\end{itemize}
+	\end{itemize}
+	$*$Intuition: for each node x, rank(x) = 1 + \# of smaller nodes\\
+	So for each node x, store the size of the subtree rooted out x, use size to compute ranks.\\\\
+	AVL Tree with nodes containing the value of the size of children (fig 4.1.1)\\
+	Rank(x), (fig 4.1.2)\\\\
+	RANK Sudo Code: 
+	\begin{lstlisting}
+	RANK(T,x):
+		r = x.left.size + 1
+		y = x
+		while y != T.root:
+			if y == y.parent.right:
+				r = r + y.parent.left.size + 1
+			y = y.parent
+		return r
+	\end{lstlisting}
+	~\\
+	SELECT(r): (fig 4.1.3)\\
+	SELECT sudo code:
+	\begin{lstlisting}
+	SELECT(r):
+		if r == N.left.size + 1: return N
+		
+		if r < N.left.size + 1: recurse on N.left and r
+		
+		if r > N.left.size + 1: recurse on N.right and r -= N.left.size - 1
+	\end{lstlisting}
+	Time is $\Theta(log n)$ since we are constant per level \\\\
+	INSERT(x):\\
+	- size of new node = 1\\
+	- increment size of ancestors\\
+	DELETE(x):\\
+	- same as insert, update size of ancestors\\\\
+	WHAT ABOUT ROTATIONS?:\\
+	(fig 4.1.4)\\\\
+	
+	\subsection{Day Two: Hashing}
+	\textbf{Problem 1:} read text file keeping track of the number of occurrences of each character (ASCII 0-127)\\
+	\textbf{Solution: } Use an array of 128 elements, Direct access table\\\\
+	\textbf{Problem 2:} Read data file, keeping track of number of occurrences of each int value (0-2$^{32}-1$)\\
+	\textbf{Solution: } Direct Access Table? All operations are $\Theta(1)$ But extremely space inefficient\\
+	So in summary: if $\|U\|$ is small and you know it ahead of time use a direct access table, otherwise use a hashtable\\\\
+	\textbf{Hash Table:}\\
+	- Universe of keys $U$ (set of all possible keys)\\
+	- has table, T, array with m positions (m, depends on application)\\
+	- has function h: $U -$ \{0, 1, ..., m-2, m-1\}\\\\
+	\textbf{HASH-TABLE-SEARCH(T,K):} T[h(k)] \\
+	what happens when $\|U\| > $m?\\
+	Collision! (pigeonhole principle) ($k_1 != k_2 \bigcap h(k_1) = h(k_2)$)\\\\
+	\textbf{Two Issues:}\\
+	- handling collisions: (when they happen)\\
+	- good hash functions\\\\
+	\textbf{Chaining} (probing-chp 11.4-another way to deal with collisions)\\
+	- each location of, T, stores a linked list of items that hash to this location\\
+	(fig 4.2.1)\\\\
+	\textbf{HASH-TABLE-INSERT(T,K)}\\
+	insert new node at head of T[h(k)] - $\Theta(1)$\\\\
+	\textbf{HASH-TABLE-DELETE(T,K)}\\
+	search linked list at T[h(k)] and delete node from linked list, runtime: same as search\\\\
+	\textbf{HASH-TABLE-SEARCH(T,K)}\\
+	search the linked list at T[h(k)]\\
+	Worst-Case for Search?\\
+	$\Theta(n)$: all keys hash to same slot\\
+	Good news: worst-case rarely is encountered. hashing works well in practice.\\
+	\emph{Expected }runtime of SEARCH w/ chaining\\\\
+	\textbf{Simple Uniform Hashing Assumption: } assume any key is equally likely to hash into any bucket.\\
+	the expected number items per bucket should be the same. (fig 4.2.2)\\
+	def$^n$: load factor $\alpha$\\
+	$\alpha = $ expected number of items in each bucket, $\alpha = \frac{n}{m}$ under "SUHA"\\\\
+	In hashtable in which collisions are resolved by chaining what is the expected runtime of an unsuccessful search? (under SUHA)\\
+	$\Theta(\frac{n}{m})$\\
+	\textbf{Note: we assume computing hash function is constant}\\\\
+	$\Theta(\frac{n}{m}) = \Theta(1)$ If $n\alpha m$\\
+	We try to allocate m-size array that is proportional to n
+	$$n\alpha m \iff n=am$$
+	\textbf{"Good" hash function: }
+	\begin{itemize}
+		\item approx. satisfies SUHA
+		\item independent of where any other key hashed to.\\ 'pt','pts'\\
+	\end{itemize}
+	Difficult to prove SUHA\\
+	- need to know the distribution of the keys\\
+	- keys might not be drawn independently\\
+	h(k) = k mod m, (be picky with m - m should not be a power of 10 or 2)\\\\
+	
+	\subsection{Lab 4: Basic Problem Theory}
+	\textbf{Sample Space: }set of all possible outcomes\\
+	\textbf{Event: }nonempty subset of the sample space\\
+	\textbf{Distribution: }Assigns a probability to each outcome s.t. $$\forall O\in S, P_r (O) \le 0 ~~\bigcap~~ \sum_{O\in S} P_r (O) = 1$$
+	\textbf{Random Variables: }Mapping of each outcome for real values\\
+	\textbf{Expectation of a Random Variable: }(Mean/Average) $$E(x)=\sum_{O\in S} X(O) P_r(O) = \sum_{y\in X} yP_r(X=y)$$
+	\textbf{L... of Expectation: } $x_1,...,x_t$ are R.V.s $$E(\sum_{i=1}^{t} x_i = \sum_{i=1}^{t} E(x_i)$$
+	$P_r(x\bigcup y) = P_r(x) + P_r(y) - P_r(x\bigcap y)$\\
+	$P_r(x\bigcap y) = P_r(x|y)P_r(y)$\\\\
+	\textbf{Average Case Running Time: }$t_n(x) =$ Running time of the algorithm on input x\\
+	$x_n=$ Set of all inputs of length n\\
+	Average Case Running Time: $$\sum_{x\in X_n} t_n(x)P_r(x)$$
+	\begin{lstlisting}
+	SearchList(H, key):
+		while H is not NULL:
+			if H.value == key:
+				return TRUE
+			H = H.next
+		return FALSE
+	\end{lstlisting}
+	Linked List has elements $a_1,...,a_8$\\
+	\textbf{Distribution on Key: }with probability $\frac{1}{2}$, key is not in \{$a_1,...,a_8$\}\\
+	with probability $\frac{1}{16}$, key = a;, for each\\
+	 
+\end{document}
