@@ -545,5 +545,59 @@
 	Linked List has elements $a_1,...,a_8$\\
 	\textbf{Distribution on Key: }with probability $\frac{1}{2}$, key is not in \{$a_1,...,a_8$\}\\
 	with probability $\frac{1}{16}$, key = a;, for each\\
-	 
+	\section{Week 5}
+	\subsection{Day One: \\\\}
+	\subsection{Day Two: QuickSort\\}
+	\begin{lstlisting}
+	QUICKSORT(A):
+		if |A| <= 1: return A
+		else:
+			select pivot p in A (deterministic or random)
+			Partition elements of A into:
+				L = {x in A | x <= p}
+				G = {x in A | x > p}
+			return QUICKSORT(L) + [p] + QUICKSORT(G)
+	\end{lstlisting}
+	Deterministic and Random pivots are typically similar in overall efficiency\\
+	\textbf{WORST-CASE: }
+	\begin{itemize}
+		\item running time is dominated by Partition
+		\item to simplify analysis: consider number of comparisons between elements of A
+		\item worst-case: either L or G is always empty. Then C(n) = (n-1) + (n-2) + ... + 1 $\in O(n^2)$
+		\item worst-case is a rare occurrence
+	\end{itemize}
+	\textbf{Expected runtime:}
+	\begin{itemize}
+		\item X: total number of comparisons performed in all Partition operations
+		\item Goal: Compute X
+		\item First: rename elements of A as $Z_1, Z_2, ..., Z_n$, where $Z_i$ is the $i^{th}$ smallest element
+		\item Define $Z_{ij} = \{Z_i, Z_i+1,...,Z_j\}$
+		\item First Observe: each pair of elements in A is compare at most once\\
+		$X_{ij} = I\{Z_i$ is compared to $Z_j$ the first time. Then $Z_i$ and $Z_j$ are separated$\}$
+		$$\sum_{i=1}^{n-1}\sum_{j=i+1}^{n}x_{ij}$$
+		Taking Expectations of both sides:
+		$$E(X) = E(\sum_{i=1}^{n-1}\sum_{j=i+1}^{n}x_{ij})$$
+		By linearity of Expectation:
+		$$ = \sum_{i=1}^{n-1}\sum_{j=i+1}^{n}E(x_{ij})$$
+		$ = \sum_{i=1}^{n-1}\sum_{j=i+1}^{n}P_r\{Z_i$ is compared to $Z_j$ when they are seperated$\}$\\\\
+		e.g $\{1, 2, 3, 4, 5, 6, $\textbf{\emph{7}}$, 8, 9, 10\}$\\
+		7 is the pivot\\
+		Partition result is $\{1, 2, 3, 4, 5, 6\}$ and $\{8, 9, 10\}$\\
+		$X_{1,10} = 0$ - 7 is compared to all - no 2 elements belonging to different sets will be compared\\
+		$X_{7,1} = 1$\\\\
+		\item \textbf{Consider: }$Z_{ij} = \{Z_i, Z_{i+1}, ..., Z_j\}$\\
+		\begin{itemize}
+			\item Once $Z_i < X < Z_j$ is chosen, $Z_i$ and $Z_j$ will never be compared\\
+			\item what if $Z_i$ is chosen? $Z_i$ is compared to all elements in $Z_{ij}$
+			\item same for $Z_j$
+		\end{itemize}
+		\item $P_r[Z_i$ is compared to $Z_j$ when they are seperated$]$\\
+		$= P_r[Z_i$ or $Z_j$ is the first pivot chosen from $Z_{ij}]$\\
+		$= \frac{2}{j-i+1}$ denom is the number of pivots to choose from\\
+		$$\sum_{i=1}^{n-1}\sum_{j=i+1}^{n}\frac{2}{j-i+1}$$
+		Let k = j-i
+		$$E(X) = \sum_{i=1}^{n-1}\sum_{k=1}^{n} \frac{2}{k+1} < \sum_{i=1}^{n-1}\sum_{k=1}^{n} \frac{2}{k}$$
+		$$ \sum_{i=1}^{n-1} O(lg n) = (n-1)O(lgn) = O(nlgn)$$
+		$$\sum_{k=1}^{n}\frac{1}{k} \le lgn + 1$$
+	\end{itemize}
 \end{document}
