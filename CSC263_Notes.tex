@@ -4,6 +4,7 @@
 \DeclarePairedDelimiter\floor{\lfloor}{\rfloor}
 \usepackage{listings}
 \usepackage{color}
+\usepackage{amsmath}
 
 \definecolor{dkgreen}{rgb}{0,0.6,0}
 \definecolor{gray}{rgb}{0.5,0.5,0.5}
@@ -546,7 +547,57 @@
 	\textbf{Distribution on Key: }with probability $\frac{1}{2}$, key is not in \{$a_1,...,a_8$\}\\
 	with probability $\frac{1}{16}$, key = a;, for each\\
 	\section{Week 5}
-	\subsection{Day One: \\\\}
+	\subsection{Day One: Bloom Filters}
+	\textbf{Bloom Filters:} a "probabilistic/approximate" dictionary. Maintains a summary or fingerprint, $F_S$, of a dynamic set S\\
+	\textbf{OPERATIONS:}\\
+	BF-INSERT($F_S$,x): $S_i$ = $S_u\{x\}$\\
+	BF-SEARCH($F_S$,x): \[ \begin{cases} 
+	"no" \implies x\in S\\
+	"probably yes" \implies probably x\in S (but perhaps not)\\
+	\end{cases}
+	\]
+	For now assume no delete operation $\implies$ "add-only" dictionary - several applications are like this (i.e actual dictionaries)\\
+	\textbf{Trade-Off:} Very space-efficient, and never false negative but possibility of false positives(low prob)\\
+	NOTE: The more space we have for BF, the smaller the probability of false positive\\
+	All Applications:\\
+	- add-only dictionaries\\
+	- keeping actual dictionary is too expensive (in terms of space/time to access)\\
+	- can tolerate false positives if theyre rare\\
+	These are the conditions under which you should consider using Bloom Filters\\\\
+	\textbf{How do they work?:}\\
+	Allocate an array of m bits BF\[0...m-1\], initially all Os (the laarger the m, the lower the prob of false positives) Define $t\ge 1$ different hash functions $h_1,...,h_t$
+	$$h_i: U \Rightarrow \{0,1,..,m-1\}$$
+	NOTE: These should be "independent" of each other
+	\begin{lstlisting}
+		BFINSERT(BF,x):
+			for i:=1 to t:
+				BF[h_i(x)] := 1
+	\end{lstlisting}
+	\begin{lstlisting}
+		BFSEARCH(BF,x):
+			for i:=1 to t:
+				if BF[h_i(x)] = 0:
+					return "no"
+			return "probably yes"
+	\end{lstlisting}
+	$h_1(x), h_2(x), ..., h_t(x)$ "fingerprint" of x \\
+	Both run in $\Theta(t)$, where $t$ is a small constant\\\\
+	Why $t$ and not specifically $t=1$?\\
+	To minimize the effect of collisions on false positives\\\\
+	Two keys that collide under $h_1$ are unlikely to collide under $h_2$ - if we design the hash functions to be independent of each other\\\\
+	Parameters to tune minimize false positives:\\
+	- m (the bigger the better - but costs space)\\
+	- t (not too small, not too large)\\\\
+	\textbf{Probability of false positive:}\\
+	False positive: when BFSEARCH(x) returns "prob yes" although $x\notin S$\\
+	Insert n keys $x_1,x_2,...,x_n$ into BF under $h_1,...,h_t$\\
+	Look for a key $x\not= x_1,...,x_n$\\\\
+	What is the probability that BF[$h_j(x)$]=1 for all $1\le j\le t$?\\
+	Find prob[BF[l]=0 after $x_1,...,x_n$ are inserted], where l, $ 0\le l<m$\\
+	= prob[$h_j(x_i)\not= l$, for each key $x_i$ and hash function $h_j$]\\
+	$h_j(x_i)\not= l \implies 1 - \frac{1}{m}$ (prob that $h_j(x_i)\not= l$)\\($\frac{1}{m}$ is the prob that $h_j(x_i) = l$ [SUHA])\\
+	= ($1-\frac{1}{m})^{nt} \approx e^{-\frac{nt}{m}}$
+	
 	\subsection{Day Two: QuickSort\\}
 	\begin{lstlisting}
 	QUICKSORT(A):
@@ -596,8 +647,227 @@
 		$= \frac{2}{j-i+1}$ denom is the number of pivots to choose from\\
 		$$\sum_{i=1}^{n-1}\sum_{j=i+1}^{n}\frac{2}{j-i+1}$$
 		Let k = j-i
-		$$E(X) = \sum_{i=1}^{n-1}\sum_{k=1}^{n} \frac{2}{k+1} < \sum_{i=1}^{n-1}\sum_{k=1}^{n} \frac{2}{k}$$
+		$$E(X) = \sum_{i=1}^{n-1}\sum_{j-i=1}^{n-i}\frac{2}{j-i+1} = \sum_{i=1}^{n-1}\sum_{k=1}^{n-i} \frac{2}{k+1} < \sum_{i=1}^{n-1}\sum_{k=1}^{n-i} \frac{2}{k}$$
 		$$ \sum_{i=1}^{n-1} O(lg n) = (n-1)O(lgn) = O(nlgn)$$
-		$$\sum_{k=1}^{n}\frac{1}{k} \le lgn + 1$$
+		$$\sum_{k=1}^{n-i}\frac{1}{k} \le lgn + 1$$
 	\end{itemize}
+	~\\\\
+	\subsection{Lab 4: Augmented Data Structure\\}
+	\textbf{Closed Interval:} (fig 5.3.1) an ordered pair of real numbers $[t_1, t_2]$ with $t_1\le t_2$ $$x\in [t_1, t_2]\iff t_1\le x\le t_2$$\\
+	\textbf{Goal:} Store a set S of intervals\\
+	\textbf{Operations:} \\1. INSERT(S, x),\\ 2.DELETE(S,x):interval, \\3.SEARCH(S,x): Return y s.t. x and y overlap, Return NULL if y doesn't exist\\
+	\textbf{Time:} O(log n)\\
+	\textbf{Step 1:} AVL Tree\\
+	\textbf{Step 2:} Chooose low endpoints as keys\\
+	\textbf{Step 3:} augment: M = max(high endpoints in the subtree) for each node\\
+	(fig 5.3.2): Updating M is logn\\
+	\begin{lstlisting}
+	Search(T,x):
+		y=root(T)
+		while y != Null and (x and y dont overlap):
+			if left(y) != NULL and M(left(y)) >= low(x):
+				then y=left(y)
+			else:
+				y=right(y)
+		return y
+	\end{lstlisting}
+	
+	\section{Week 6}
+	\subsection{Day One: ADT - Disjoint Sets\\}
+	\textbf{Objects:} collection of nonempty disjoint dynamic sets $$S= \{s_1, s_2, ..., s_k\}$$
+	*Each set is identified by unique representative\\\\
+	\textbf{Operations: }MAKE-SET(x): creates new set $S=\{x\}$\\
+	UNION(x,y):unites sets containing x and y into a new set\\
+	FIND-SET(x): returns a pointer to representative of set containing x\\\\
+	MAKE-SET(1)\\
+	$S=\{1\}$\\
+	MAKE-SET(2)\\
+	$S=\{\{1\},\{2\}\}$\\
+	MAKE-SET(3)\\
+	$S=\{\{1\},\{2\},\{3\}\}$\\
+	FIND-SET(2) = 2\\
+	UNION(1,2)\\
+	$S=\{\{1,2\},\{3\}\}$\\
+	FIND-SET(2) = 1\\
+	UNION(1,3)\\
+	$S=\{\{1,2,3\}\}$\\
+	FIND-SET(3) = 1\\\\
+	Q: What is the most number of UNIONS we can perform after n MAKE-SETs?\\
+	A: n-1\\\\\\
+	We want a data structure that minimizes the total cost of performing a sequence $\sigma$\\
+	$\sigma$: n-1 UNIONs and $m\ge n$ FIND-SETs ($\implies > n$ MAKE-SETs)\\\\
+	\begin{enumerate}
+		\item \textbf{Linked List}\\
+		$S_1$ (fig 6.1.1)\\
+		$S_2$ (fig 6.1.2)\\
+		FIND-SET(x): O(n)\\
+		UNION(x,y): O(1) (just have the head of the second set be added as the tail of the first)(fig 6.1.3)\\
+		Q: What is the cost of $\sigma$?\\
+		A: O(n + m*n) where UNIONS: O(n) and FIND-SETs: O(m*n)\\
+		\item \textbf{Augmented linked list}\\
+		$S_1$ (fig 6.1.4)\\
+		$S_2$ (fig 6.1.5)\\
+		FIND-SET(x): O(1)\\
+		UNION(x,y): O(n) (fig 6.1.6)\\
+		\textbf{Q:} What about a sequence of n-1 UNIONs?\\
+		MAKE-SET($X_1$), ... , MAKE-SET($x_n$)\\ 
+		Number of pointers updated:\\
+		UNION($x_2,x_1$): 1\\
+		UNION($x_3,x_2$): 2\\
+		UNION($x_4,x_3$): 3\\
+		UNION($x_n,x_{n-1}$): n-1\\
+		UNION(x,y): $\sum_{i=1}^{n-1}i=\Theta(n^2)$\\
+		
+		\item \textbf{Augmented Linked List with weighted union heuristic}\\
+		Suppose each list also contains its length (easily maintained)\\
+		Then: we can always append smaller list to bigger list\\
+		UNION($s_1,s_2$): Runtime of $\sigma$ is O(m+nlogn)\\
+		Analysis of runtime:\\
+		*How many times is a single element's representative pointer updated?\\
+		Fact: each time x's pointer was updated, x must have started in the smaller set\\
+		$\implies$ x's resulting set must have at least double\\
+		$1^{st}$ time x's representative was updated, x's resulting set had at least 2 elements\\
+		$2^{nd}$ time x's representative was updated, x's resulting set had at least 4 elements\\
+		k$^{th}$ time x's representative was updated, x's resulting set had at least $2^k$ elements\\
+		k is at most $\floor{log n}$ ~~~~($2^{\floor{log n}} \le n$)\\
+		$\implies$ n UNIONs is O(nlogn)\\
+		cost of $\sigma$ is O(m+nlogn)\\
+		\item \textbf{OPTIMAL: Disjoint Forest}\\
+	\end{enumerate}
+	
+	\subsection{Day Two: Disjoint Forest}
+	\textbf{Forest Structure: \\}
+	- Each set is an "inteverted tree" where elements only have pointers to parents\\
+	- Representative is the root\\
+	\textbf{Note:} trees are not necessarily binary\\\\
+	UNION($S_1,S_2$) - (fig 6.2.1)\\\\
+	MAKE-SET(x): create new tree with root x - O(1)\\
+	UNION(i,j): make root of one tree child of another - O(1)\\
+	FIND-SET(x): follow pointers to root - O(depth of node x)\\\\
+	Worst-Case sequence?:\\
+	- n-1 UNIONs can create a tree that is 1 long chain - (fig 6.2.2)\\
+	If we call FIND-SET($x_n$) m times, we get $\Theta(n*m)$\\
+	How to avoid increasing height of tree?\\ - append smaller tree to larger - (fig 6.2.3)\\
+	Heuristics to improve performance?\\
+	- UNION by rank:\\
+	definition of rank: an upper bound on the height of the tree could be equal to true height, but might bee more because not always efficient to maintain height\\
+	MAKE-SET(x): same as before + set rank(x) = 0\\
+	UNION(i, j): the node with higher rank is the new root and it's rank is the same\\
+	If both i and j have the same rank, pick first one as root and increase its rank by 1\\
+	\textbf{Path Compression:\\}
+	During FIND-SET(B): (fig 6.2.4)\\
+	Total cost of Executing (n-1 UNIONS, $m\ge n$ FINDs) is:\\
+	- $\theta(mlog(*n)$\\
+	- $O(m\alpha^{-1}(m,n))$\\
+	- $\Omega(m\alpha^{-1}(m,n))$\\\\
+	\subsection{Lab 5: Disjoint Sets}
+	Linked List Implementation: (fig 6.3.1)\\
+	2 Parameters:\\
+	- n: number of MAKESETS (at most n-1 UNIONS)\\
+	- m: number of FINDSETS\\\\
+	\textbf{Theorem: }Using the linked list representation of a disjoint set and the weighted union heaurisitc, a sequence if n-1 unions and m findsets takes O(m+logn) time\\
+	\textbf{UNION:}\\
+	 1$^{st}$ update $\implies$ $2\le$ elements\\
+	2$^{nd}$ update $\implies$ $4\le$ elements\\
+	k$^{th}$ update $\implies$ at least $2^k$ elements\\
+	Time: O(nlogn)\\
+	\textbf{FINDSET:} Time: O(1)\\\\
+	Q: Consider the following operation of disjoint sets:\\
+	PRINT(x): Prints every element in $S_x$ (the set containing x) show how to augment the tree data structure to implement PRINT(x) in O($|S_x|$) time without affecting the runtime of the outer operations\\
+	A: keep track of the tail, when calling union change the pointer to the tail
+	
+	\section{Week 7}
+	\subsection{Day One: Amortized Analysis and beginning of Dynamic Tables}
+	\textbf{Motivation:} looking at worst-case time complexity per operation can be too pessimistic\\
+	\textbf{Definition:} Average time required to perform a sequence of operations on a data structure over all operations performed\\\\
+	Example of where worst-case is overly pessimistic: fig 7.1.1\\\\
+	\textbf{Three Methods:}\begin{enumerate}
+		\item Aggregate
+		\item Accounting
+		\item Potential (Not covered in this course, but is in textbook)
+	\end{enumerate}
+	\textbf{Aggregate Analysis:\\}
+	A sequence of n operations takes worst-case time T(n) in total\\
+	$\approx$ amortized cost is $\frac{T(n)}{n}$\\\\
+	\textbf{Example:} incrementing a binary counter\\
+	The counter: k-bit binary counter that starts counting from 0\\
+	cost = number of bit flips\\
+	The array: fig 7.1.2\\
+	k=4 example: fig 7.1.3\\
+	worst-case: all bits are flipped - O(k)\\
+	worst-case for a sequence of k is O($k^2$)\\\\
+	The Aggregate Analysis of fig 7.1.3\\
+	- bit at i = 0 flips everytime $\Rightarrow$ n times\\
+	- bit at i = 1 flips every 2$^{nd}$ time $\Rightarrow \floor{\frac{n}{2}}$\\
+	- bit at i = j flips every $2^j$ times $\Rightarrow \floor{\frac{n}{2^j}}$\\\\
+	In general, A[i] flips $\floor{\frac{n}{2^i}}$ times\\
+	Total number of flips in sequence: $$\sum_{i=0}^{k-1}\floor{\frac{n}{2^i}} < n\sum_{i=0}^{\infty}\frac{1}{2^i} = 2n < O(n)$$
+	T(n) = O(n) $\Rightarrow \frac{T(n)}{n} = O(1)$ (Amortized cost of an operation)\\\\
+	\textbf{Accounting Method\\}
+	IDEA: impose an extra charge on inexpensive operations and use it to "pay for" expensive operations later.\\\\
+	Accounting method for binary counter:\\
+	What should we charge for an increment operation?\\
+	\$2/increment (shows we have O(1) amortized)\\
+	- \$1 to set a bit to 1\\
+	- leave \$1 on the bit (to be used later when we set back to 0)\\\\
+	Outline of Proof:\\
+	(we always have money for operations)\\
+	1. Every 1 bit has a \$ on it (simple proof by induction)\\
+	2. At most one 0 bit gets flipped to 1\\\\
+	\textbf{Dynamic Tables\\}
+	In C:\\
+	var a[20]; $\leftarrow$ contiguous space in memory\\
+	In Python:\\
+	var a = [] (python copies the array, when the space is filled, into a larger array)\\
+	
+	\subsection{Day Two: Dynamic Tables}
+	
+	declaring an array in C: type arrayName[array Size];\\
+	vs Python: l = [] - dynamic array\\\\
+	- dynamically expanding and contracting array\\ 
+	- also: \begin{itemize}
+			\item keep insertion and deletion - O(1) amortized\\
+			\item guarantee unused space never exceeds constant fraction of total space\\
+			\item we define a load factor $\alpha$(T)\\
+			$$\alpha(T) = \frac{\#~of~items~stored~in~T}{size~of~T}$$
+			$$\alpha(T) \ge c$$
+	\end{itemize}
+	\textbf{Common heuristic:} allocate a new table with twice as many slots, and copy all elements over\\\\
+	\textbf{Consider} just insertions:\\
+	\[ \begin{cases} 
+	1 & if~there~is~room \\
+	i & if ~there~isn't\\ 
+	\end{cases}
+	\]
+	note: $i - 1$ is a power of 2\\
+	$$\sum_{i=1}^{n}c_i < n + \sum_{j=0}^{\floor{logn}}2^j = 2^{\floor{logn} + 1}$$
+	Recall:
+	$$\sum_{i=0}^{k}2^i = 2^{k+1} - 1$$
+	$< n + 2n = 3n$ - amortized per operation $\Rightarrow \frac{3n}{n} \in O(1)$\\\\
+	
+	\textbf{Accounting Method\\}
+	\$3/item
+	\begin{itemize}
+		\item \$1 insert itself into array
+		\item \$1 move itself when table expands
+		\item \$1 move over another item that has already been moved\\
+	\end{itemize}
+	Suppose table has just been expanded (fig 7.2.1)\\
+	\textbf{Note:} there is no credit in the table\\
+	\begin{itemize}
+		\item For the next expansion to occur $\frac{m}{2}$ elements will be inserted
+		\item There will be \$2$*\frac{m}{2} = \$m$ in credit\\
+	\end{itemize}
+	Table expansion and contraction:\\
+	want to bound load factor above and below by positive constant\\\\
+	\textbf{IDEA (flawed):} halve when less than half full and double when full (fig 7.2.2)\\\\
+	\textbf{IDEA:} double when table is full and halve when $<\frac{1}{4}$ full\\
+	\textbf{Accounting Method: (fig 7.2.3)}
+	\begin{itemize}
+		\item insertion: same
+		\item deletion: \$2 per operation
+		\item \$1 to perform deletion
+		\item \$1 stored in empty set
+	\end{itemize}
+	
 \end{document}
