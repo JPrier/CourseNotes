@@ -870,4 +870,303 @@
 		\item \$1 stored in empty set
 	\end{itemize}
 	
+	\section{Week 8}
+	\subsection{Day One: ADT}
+	Homework: Read Breadth First Search sudo code\\\\
+	\textbf{ADT: }Graphs\\
+	\textbf{objects:} V - a set of vertices\\
+	E - set of ordered pairs (if directed) or a set of unordered pairs (if undirected)\\
+	(fig 8.1.1)\\\\
+	
+	\textbf{Graph Representation:}\begin{enumerate}
+		\item Adjacency list
+		\item Adjacency Matrix
+	\end{enumerate}
+	(fig 8.1.2)\\\\
+	\textbf{Tradeoffs:}\begin{itemize}
+		\item adj. list is more space efficient
+		$$ \Theta(|v| + |E|)~~vs~~\Theta(|v|^2)$$
+		note: Upperbound on $|E|$ is $\Theta(|V|^2)$\\\\
+		However, if we have a dense graph (i.e. $|E|\in\Theta(|V|^2)$) then asymptotic-space complexity is equivalent\\
+	\end{itemize}
+	\textbf{Adj. List:\\}
+	- easier to store additional information on edges\\
+	\textbf{Adj. Matric:\\}
+	- you can check if (u,v) exists in O(1)\\\\\\
+	
+	\textbf{Breadth First Search:} (fig 8.1.3)\begin{itemize}
+		\item simple, intuitive method for searching a graph
+		\item "backbone" of many important graph algorithms
+	\end{itemize}
+	The BFS tree represents the shortest paths from source to all vertices\\\\
+	
+	\underline{IDEA:} start at a "source" node and explore the neighbor nodes fist before moving on to "next level" neighbors\\\\
+	\textbf{Q:} how do we find vertex "v"'s neighbors?\\
+	\textbf{A:} (fig 8.1.4)\\\\
+	
+	\textbf{Runtime:}\begin{itemize}
+		\item runtime is dominated by accessing edges
+		\item adj. list implementation: $\Theta(|v| + |E|)$
+		\item adj. matrix: $\Theta(|v|^2)$\\\\ 
+	\end{itemize}
+	
+	\subsection{Day Two: BFS}
+	figures in stat notebook\\\\
+	Reading: read textbook section on BFS and read proof\\\\
+	Why $\Theta(|v| + |E|)$?\\
+	v - initialization (set each vertex to white)\\
+	E - traverse each edge reachable from source\\\\
+	\textbf{Lemma 0:} After doing BFS(s): $\forall v\in V, \delta(s,v)\le d[v]$\\
+	\textbf{Lemma 1:} If u enters Q before V enters Q then d[u] $\le$ d[v] (in textbook)\\
+	\textbf{Theorem:} After doing BFS(s): $\forall v\in V, \delta(s,v) = d[v]$\\\\
+	\textbf{Proof:} Suppose, for a contradiction, for some node x $$d[x] \neq \delta(s,x)$$
+	Let v be the closet node from s such that $$d[v] \neq \delta(s,v)$$
+	By Lemma 0, $d[v] > \delta(s,v)$\\\\
+	Consider shortest path from s to v. Let $(u,v)$ be the last edge on that path. Note the length of this path is $\delta(s,v) = \delta(s,u) + 1$ (+1 is from adding the edge $(u,v)$). \\
+	By our choice of $v$, since $u$ is closer to $s$ than $v$, we have $$d[u] = \delta(s,u)$$
+	Putting together $$d[v] > \delta(s,v) = \delta(s,u) + 1 = d[u] + 1 \Rightarrow d[v] > d[u] + 1 ~~(*)$$
+	$$(*) ~~ d[v] > d[u] + 1$$\\
+	Want to get a contradiction to $(*)$\\
+	Consider the colour of $v$ at the time node $u$ is first explored by BFS.\\
+	\begin{enumerate}
+		\item $v$ is WHITE $\implies$ v has not yet been discovered $\implies$ discovered during exploration of u $\implies d[v] \leftarrow d[u] + 1$ contradiction
+		\item $v$ is BLACK $\implies$ v was already discovered and explored $\implies$ v was enqueued and dequeued before u was enqueued. By Lemma 1: $$d[v] \le d[u]$$ Contradiction
+		\item $v$ is GREY $\implies$ v discovered (by other vertex)  but not yet explored.\\
+		Let w be the node that discovered v. This discovery occurred bbefore the exploration of u. $\implies$ w was enqueued before u was enqueued. By Lemma 1, $$d[w]\le d[u] \implies d[w] + 1 \le d[u] + 1$$ Since v was discovered by w $$d[v] \leftarrow d[w] + 1$$ $\implies d[v] \le d[u] + 1$ Contradiction\\
+	\end{enumerate}
+	Contradiction since all 3 lead to contradiction\\\\
+	
+	\section{Week Nine}
+	\subsection{Day One: DFS}
+	figures in math notebook\\\\
+	Read over textbook section\\
+	Look at code for DFS in textbook\\\\
+	\underline{\textbf{DFS vs. BFS}}\\
+	DFS: search "deeper" whenever possible, multiple sources, DFS forest, store timestamps, v.d=discovery time, v.f=finishing time\\\\
+	BFS: search "wider" whenever possible, single source, BFS tree, \\\\
+	Same Complexity\\\\\\
+	
+	\textbf{Q:} Why -timestamps, DFS-forest, etc?\\
+	 -~~Provides useful info about the structure of the graph + helpful for reasoning about behavior of DFS\\\\
+	 Graph: (fig 9.1.1)\\
+	 DFS-Forest of the Graph(fig 9.1.2)\\\\
+	 \underline{Backedge:} when you come across a grey non-direct ancestor node\\
+	 \underline{Cross-Edge:} when you come across a black node - only occur in directed graphs\\
+	 \underline{forward-edge:} when you come across a grey non-direct child node\\\\
+	 \textbf{Runtime:}\begin{itemize}
+	 	\item color all vertices white: $\Theta(|V|)$
+	 	\item DFS-VISIT on every vertex exactly once $\Rightarrow$ Adj. list of each vertex is read exactly once $\Rightarrow$ all edges in G are examined exactly once $\Rightarrow \Theta(|E|)$
+	 	\item Total: $\Theta(|V| +|E|)$  ($\Theta(|V|^2)$ if adj. matrix)\\ 
+	 \end{itemize}
+	 \textbf{Parenthesis Theorem:\\}
+	 For all vertices $u,~v$ either $v$ is a descendant of $u$ in the DFS-Forest and [d[v], f[v]] is entirely contained within [d[u], f[u]] 
+	 \begin{itemize}
+	 	\item vice versa: if $u$ is a descendant of $v$
+	 	\item neither is a descendant of the other $\rightarrow$ intervals are disjoint\\
+	 	~[u.d u.f][v.d v.f] or [v.d v.f][u.d u.f]\\
+	 \end{itemize}
+	 \textbf{Corollary }(to parenthesis Theorem):\\
+	 v is a descendent of u\\
+	 $$iff$$
+	 $$d[u]<d[v]<f[v]<f[u]$$\\\\
+	 We distinguish between different kinds of edges in DFS-Forest:
+	 \begin{itemize}
+	 	\item tree edges (u,v) v is white (undiscovered) when (u,v) is examined
+	 	\item backedges (u,v) v is an ancestor of u and v is grey when (u,v) is examined
+	 	$$d[v]<d[u]<f[u]<f[v]$$
+	 	\item forwardedge (u,v) v is a descendant of u and v is black when (u,v) is examined
+	 	\item crossedge (u,v) neither is a descendant of the other -- v is black when (u,v) is examined
+	 	$$d[v]<f[v]<d[u]<f[u]$$
+	 \end{itemize}
+	 
+	 \subsection{Day Two: DFS\\}
+	 \textbf{\underline{Properties of DFS:\\}}
+	 discovery abd finishing times have a \emph{parenthesis structure}
+	 $$\forall u,v \in G.V$$
+	 [u.d [v.d v.f] u.f] or [u.d u.f] [v.d v.f]\\\\
+	 \textbf{Corollary 22.8: }vertex v is a descendant of u in a DFS forest 
+	 $$iff~~u.d < v.d < v.f < u.f$$\\\\
+	 \textbf{White Path Theorem:\\}
+	 In a DFS forest of graph G, vertex v is a descendant of u iff at the time of the search discovers u, there is a path from u to v consisting entirely of white vertices.\\
+	 (fig 9.2.1)\\\\
+	\textbf{Proof:}\\
+	 ($\Rightarrow$) Suppose v is a descendant of u. By Corollary 22.8 $$u.d < v.d$$ at the time of u's discovery v is white. This is true for any descendant v of u. Therefore, all vertices on the unique path from u to v in DFS forest are white at time u.d\\\\
+	 ($\Leftarrow$) By contradiction\\
+	 Suppose that there is a path of white vertices from u to v at time u.d but v does not become a descendant of u.\\
+	 Assume v is the closest vertex to u that doesn't become a descendant of u. (fig 9.2.2)\\
+	 By Corollary 22.8, w.f $\le$ u.f\\
+	 Also: v must be discovered after u (b/c v is white when u is discovered) but before w is finished (because of edge (w,v))\\
+	 $$u.d<v.d<w.f\le u.f$$
+	 we can conclude: $v.f<u.f$. Otherwise, Parenthesis Theorem is violated.\\
+	 Now we have: $u.d<v.d<v.f<u.f$\\
+	 By Corollary 22.8: v is a descendant of u.\\\\
+	 \textbf{\underline{Theorem:}} A directed graph is acyclic iff a DFS of G yields no back edges\\
+	 \textbf{Proof:} ($\Rightarrow$) Suppose DFS produces a back edge (u,v)\\
+	 -~~~~~~~~$\Rightarrow$ v is an ancestor of u in the DFS forest(by definition)\\
+	 -~~~~~~~~$\Rightarrow$ G must have a path from v to u\\
+	 -~~~~~~~~$\Rightarrow$ edge (u,v) completes the cycle\\\\
+	 ($\Leftarrow$) Suppose G contains a cycle c. Let v be the first vertex discovered in cycle. Let u be the preceeding edge.(fig 9.2.4) White Path Theorem $\Rightarrow$ (fig 9.2.3) $\Rightarrow$ when we discover (u,v) it becomes a back edge.\\\\
+	 
+	\section{Week 10}
+	\subsection{Day One: }
+	\subsection{Day Two: MSTs}
+	\underline{\textbf{MSTs\\}}
+	\textbf{Input:} Connected, undirected, weighted graph G\\
+	\textbf{Output:} Spanning tree of G of minimum weight $\Leftrightarrow$ "path between any 2 vertices in cheapest way"\\\\
+	\begin{lstlisting}
+	GENERIC-MST(G=(V,E), w:E->R):
+		T<-{}
+		while |T| < n-1:
+			find e "safe for T" (*)
+			T <- T U {e}
+	\end{lstlisting}
+	\textbf{Theorem 23.1}
+	\begin{itemize}
+		\item Let G=(V, E) be connected, undirectted weighted graph
+		\item Let A $\underline{\subset}$ E and A is included in some MST of G
+		(fig 10.2.1)
+		\item Let (S, V-S) be any cut of G that respects A (fig 10.2.2)
+		\item Let (U, V) be a light edge crossing (S, V-S)
+	\end{itemize}
+	A $\underline{\subset}$ of some MST $\implies$ (U,V) is safe for A $\Leftrightarrow$ A $\bigcup$ \{(U,V)\} is included in some MST of G  \\\\
+	\underline{\textbf{Kruskal's Algorithm}}\\
+	\textbf{Idea:} look at the edges of non-decreasing weight; select each edge that does not create a cycle in T.
+	$$\Leftrightarrow$$
+	endpoints of edge are in different connected components of T
+	\begin{lstlisting}
+		KRUSKAL-MST(G=(V,E), w:E->R):
+			T<-{}
+			sortedges: w(e1)<= ... <= w(em)
+			for i<-1 to m:
+				#let (vi, ui) = ei
+				if ui, vi in diff connected components of T
+					T<-T U {ei}
+	\end{lstlisting}
+	MST algo: (fig 10.2.3)\\\\
+	\textbf{How do we find connected components?\\}
+	- could do this with BFS/DFS, HOW?\\
+	--- start search at u, and return TRUE if you find v; FALSE o.w.\\
+	- each test of connectivity takes O(n)\\
+	- iterate m times\\
+	- total O(mn)\\\\
+	
+	Better idea: use disjoint set ADT to keep track of connected components
+	\begin{lstlisting}
+	KRUSKAL-MST(G=(V,E), w:E->R):
+		T<-{}
+		sortedges: w(e1)<= ... <= w(em)    #(1)
+		for each v in V: MAKE-SET(v)        #(2)
+		for i<-1 to m: #let ei = (ui, vi)#^ 
+			S1 <- FIND-SET(ui)			      #^
+			S2 <- FIND-SET(vi)			      #^
+			if S1 != S2:				 			#^
+				T<-T U {ei}				 			#^
+				UNION(S1, S2)			 		   #(2)
+	\end{lstlisting}
+	\textbf{Runtime:} \begin{enumerate}
+		\item $\Theta$(mlogn)
+		\item 2m FIND-SET, n-1 UNIONS $\rightarrow$ O(mlog*n)\\
+	\end{enumerate}
+	\subsection{Lab 9: PrimMST}
+	\begin{lstlisting}
+	PrimMST(G):
+		v = pick starting vertex from G.vertices
+		TV = {v} #vertex set
+		TE = {} #edge set
+		
+		while TV != G.vertices:
+			extenstions = {(u,v) in G.edges where exactly one of u.v is in TV}
+			e = edge in extensions having min weight
+			TV = TV + endpoint of e
+			TE = TE + {e}
+		
+		return TE
+	\end{lstlisting}
+	Example of algorithm in connected-undirected graph: (fig 10.3.1)\\\\
+	$|V| - 1$ iterations $\implies$ O($|V|$)\\
+	Total time = O($|V||E|$)\\
+	\begin{lstlisting}
+	PrimMST(G): #revised
+	v = pick starting vertex from G.vertices
+	TV = {v} #vertex set
+	TE = {} #edge set
+	extensions = empty heap #treat weights as priority
+	for each edge on v:
+		Insert(extension, edge)
+	while TV != G.vertices:
+		e = ExtractMin(extensions) #do until we find u not in TV
+		u = endpoint of e not in TV
+		TV = TV + {u}
+		TE = TE + {e}
+		
+		for each edge on u:
+			if other endpoint of the edge is not in TV:
+				Insert(extensions, edge) 
+	return TE
+	\end{lstlisting}
+	Example of algorithm on connected-undirected graph: (fig 10.3.2)\\\\
+	\textbf{Runtime:\\}
+	Two for loops, each edge in G will only be checked twice. 2$|E|$ = O($|E|$)\\
+	Insertion: O($log|E|$)\\
+	total: O($|E|log|E| + |V|$)\\\\
+	
+	\section{Week 11}
+	\subsection{Day One: Complexity Theory}
+	Notes:\begin{itemize}
+		\item every algo we'vee seen so far has been polynomial-time on inputs of size n, their worst-case runtimes are O($n^k$) for some constant k.
+		\item polytime: "easy"
+		\item super-polytime: "hard"
+	\end{itemize}
+	\textbf{"NP-complete problems"\\}
+	status \emph{unknown}: don't know if there exists a polytime solution\\\\
+	\underline{\textbf{Classes of Problems}}\\
+	\textbf{P}: solvable in polytime\\
+	\textbf{NP}: "verifiable" in polytime (able to check their solutions in polytime)\\
+	\textbf{Clearly:} P $\le$ NP\\
+	Most important open question in CS: Does P=NP?\\
+	\textbf{\underline{NP-Complete:}} "hardest" NP-problems
+	\begin{itemize}
+		\item inputs are small $\implies$ exp. time might be okay
+		\item isolate special cases that can be solved in polytime
+		\item come up with approx. efficient algos that give near optimal solution
+	\end{itemize}
+	\underline{\textbf{Approx. algos}}\\
+	C: cost of solution produced by our algo\\
+	C$^*$: optimal solution\\
+	$$max(\frac{C}{C^*}, \frac{C^*}{C})\le p(n)$$
+	$p(n):$ approx. ratio\\\\
+	\underline{\textbf{Traveling Salesman Problem (TSP)}}\\
+	Problem:
+	\begin{itemize}
+		\item cities that are connected by roads $\implies$ complete graph
+		\item the salesman wants to make a tour to visit each city \underline{exactly once} and finish at the city he started 
+	\end{itemize}
+	c(i,j): cost to go from city i to city j\\
+	(fig 11.1.1)\\
+	we let the cost function satisfy the triangle inequality:
+	$$\forall u,v,w\in V: c(u,w)\le c(u,v) + c(v,w)$$
+	ex: Euclidean distance (fig 11.1.2)\\\\
+	\textbf{Approx-TSP-Tour}(G,c):
+	\begin{itemize}
+		\item select r$\in$ G.V	to be "root" vertex (starting point)
+		\item T-MST-PRIM(G,c,r)
+		\item let H be a list of vertixes, ordered according to when they are visited in a pre-order walk of T
+		\item return H
+	\end{itemize}
+	Tour from graph: (fig 11.1.3)\\
+	\textbf{Runtime:} same as MST algo\\\\
+	\textbf{\underline{Theorem:}} APPROX-TSP-TOUR is a polytime 2-approx algo for TSP problem with triangle inequality\\
+	(2-approx: our approximation will never be 2 times the best solution)\\
+	\textbf{Proof:}\\
+	Let H$^*$ be the optimal tour for the given set of vertices\\
+	Note: if you remove one edge of H$^*$ (a tour) you have a spanning tree (because the tour is one large cycle)\\
+	$$c(T) \le c(H^*)$$
+	a fullwalk( = w) of T lists the vertices whenever they are visited in the preorder traversal\\
+	ex from fig 11.1.3: \textbf{a},\textbf{b},\textbf{c},b,\textbf{h},b,a,\textbf{d},\textbf{e},\textbf{f},e,\textbf{g},e,d,a\\\\
+	Fullwalk, w, traverses every edge exactly twice $\implies c(w) \le 2c(T)$\\
+	cost w is within a factor of 2 of the cost of optimal tour: $c(w)\le 2(c(T)^*)$\\\\
+	\textbf{But:} there's no guarantee that w is a tour\\
+	By triangle inequality: whenever we delete a visit to any vertex in the walk w, the cost c(w) doesn't increase\\
+	Remove duplicates from w, this gives us tour H
+	$$c(H)\le c(w)\le 2(c(H)^*)$$
 \end{document}
