@@ -1149,7 +1149,7 @@
 	\textbf{Approx-TSP-Tour}(G,c):
 	\begin{itemize}
 		\item select r$\in$ G.V	to be "root" vertex (starting point)
-		\item T-MST-PRIM(G,c,r)
+		\item T=MST-PRIM(G,c,r)
 		\item let H be a list of vertixes, ordered according to when they are visited in a pre-order walk of T
 		\item return H
 	\end{itemize}
@@ -1169,4 +1169,44 @@
 	By triangle inequality: whenever we delete a visit to any vertex in the walk w, the cost c(w) doesn't increase\\
 	Remove duplicates from w, this gives us tour H
 	$$c(H)\le c(w)\le 2(c(H)^*)$$
+	
+	\subsection{Day Two: Decision Trees for Lower Bounds}
+	O(nlogn) sorting algorithms: mergesort, heapsort, quicksort\\
+	\textbf{Can we do better??\\}
+	Note: these algorithms rely only on comparisons between input elements to gain information\\
+	- These are comparison-based sorting algorithms\\
+	\underline{\textbf{Decision Trees}}\\
+	ex: Algorithm: Insertion Sort, Instance: n=3 (fig 11.2.1)
+	\begin{itemize}
+		\item represents every sequence of comparisons that a specific algorithm makes on an input size n
+		\item edges denote the result of a single comparison
+		\item * each leaf represents a permutation of the input
+		\item any correct sorting algorithm must be able to produce each permutation of it's input
+	\end{itemize}
+	\textbf{Claim:} The depth of a decision tree for a given value of n is $\Omega(nlogn)$\\
+	\textbf{Proof:} The decision tree has to have a leaf for every permutation of the input $\implies$ n! leaves\\
+	A tree of height h has at most $2^{h+1}$ leaves $$2^{h+1}\ge n!$$ $$h+1\ge log(n!) = log(n(n-1)....(2)(1))$$ $$= log(n) + log(n-1) + ... + log(1)$$ $$\ge (\frac{n}{2})log(\frac{n}{2})$$ $$\in \Omega(nlogn)$$
+	\textbf{Claim:} every comparison sort edge requires $\Omega(nlogn)$ comparisons in worst-case\\
+	\textbf{Proof:} Given a comparison sort, we look at the decision tree it generates on inputs of size n
+	\begin{itemize}
+		\item each path from root to leaf is one possible sequence of comparisons
+		\item length of path = number of comparisons 
+		\item height of tree = worst-case execution\\
+	\end{itemize}
+	NOTE: Linear sorting algorithms exist, \textbf{but} they require assumptions about the input (i.e input values are bounded, uniform distribution, number of digits are bounded)\\\\
+	\section{LAST WEEK}
+	\subsection{Day Two: REVIEW?}
+	\underline{\textbf{Topics Covered in This Course:}}
+	\begin{itemize}
+		\item upper + lower bound complexity on algorithms
+		\item heaps, binomial heaps
+		\item BSTs, AVL Trees
+		\item Augmenting data structures
+		\item Hashing
+		\item exp. running time of random algorithms
+		\item disjoint sets
+		\item amortization (i.e. dynamic tables)
+		\item graphs - BFS, DFS, topological sort, MSTs (Kruskal, Prim)
+		\item problem complexity lower bounds (decision tree model)
+	\end{itemize}
 \end{document}
